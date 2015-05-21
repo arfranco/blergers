@@ -9,11 +9,27 @@ module Blergers
   class Post < ActiveRecord::Base
     has_many :post_tags
     has_many :tags, through: :post_tags
+
+    def self.page(n)
+      if n == 1
+        self.order(date: :desc).limit(10)
+      else
+        self.order(date: :desc).limit(10).offset((n * 10) - 10) 
+      end
+    end
   end
 
   class Tag < ActiveRecord::Base
     has_many :post_tags
     has_many :posts, through: :post_tags
+
+    def self.top_tags
+      tags = self.select('id')
+      tags.each do |x|
+         tag_count = Blergers::PostTag.where("tag_id: == #{x.id}", :tag_id).count
+      end
+    end
+
   end
 
   class PostTag < ActiveRecord::Base
